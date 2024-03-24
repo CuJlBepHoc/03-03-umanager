@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sethvargo/go-envconfig"
+	"github.com/streadway/amqp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"google.golang.org/grpc"
@@ -20,6 +21,7 @@ import (
 	"gitlab.com/robotomize/gb-golang/homework/03-03-umanager/internal/database/users"
 	"gitlab.com/robotomize/gb-golang/homework/03-03-umanager/internal/env/config"
 	"gitlab.com/robotomize/gb-golang/homework/03-03-umanager/internal/link/linkgrpc"
+	link_updater "gitlab.com/robotomize/gb-golang/homework/03-03-umanager/internal/link/stories/link-updater"
 	"gitlab.com/robotomize/gb-golang/homework/03-03-umanager/internal/user/usergrpc"
 	"gitlab.com/robotomize/gb-golang/homework/03-03-umanager/pkg/pb"
 )
@@ -29,6 +31,7 @@ type Env struct {
 	ApiGWHTTPServer *http.Server
 	LinksGRPCServer *grpc.Server
 	UsersGRPCServer *grpc.Server
+	LinkUpdater     *link_updater.Story
 }
 
 func Setup(ctx context.Context) (*Env, error) {
@@ -56,6 +59,21 @@ func Setup(ctx context.Context) (*Env, error) {
 		return nil, fmt.Errorf("pgxpool Connect: %w", err)
 	}
 
+	amqpConn, err := amqp.Dial(cfg.LinksService.AMQP.String())
+	if err != nil {
+		return nil, fmt.Errorf("amqp Dial: %w", err)
+	}
+
+	defer amqpConn.Close()
+
+	amqpChannel, err := amqpConn.Channel()
+	if err != nil {
+		return nil, fmt.Errorf("amqp Channel: %w", err)
+	}
+
+	// задекларируйте очередь
+	// amqpChannel.QueueDeclare()
+
 	usersRepository := users.New(usersDBConn, 5*time.Second) // вынести в конфиг duration
 	linksRepository := links.New(
 		linksDBConn.Database(cfg.LinksService.Mongo.Name),
@@ -63,7 +81,7 @@ func Setup(ctx context.Context) (*Env, error) {
 	)
 
 	{
-		handler := linkgrpc.New(linksRepository, cfg.LinksService.GRPCServer.Timeout)
+		handler := linkgrpc.New(linksRepository, cfg.LinksService.GRPCServer.Timeout, amqpChannel)
 
 		s := grpc.NewServer()
 		reflection.Register(s) // этот код нужен для дебаггинга
@@ -120,8 +138,11 @@ func Setup(ctx context.Context) (*Env, error) {
 		IdleTimeout:       cfg.ApiGWService.ReadTimeout,
 	}
 
+	linkUpdaterStory := link_updater.New(linksRepository, amqpChannel)
+
 	env.ApiGWHTTPServer = apiGWServer
 	env.Config = cfg
+	env.LinkUpdater = linkUpdaterStory
 
 	return env, nil
 }

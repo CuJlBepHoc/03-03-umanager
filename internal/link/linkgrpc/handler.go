@@ -15,13 +15,14 @@ import (
 
 var _ pb.LinkServiceServer = (*Handler)(nil)
 
-func New(linksRepository linksRepository, timeout time.Duration) *Handler {
-	return &Handler{linksRepository: linksRepository, timeout: timeout}
+func New(linksRepository linksRepository, timeout time.Duration, publisher amqpPublisher) *Handler {
+	return &Handler{linksRepository: linksRepository, timeout: timeout, pub: publisher}
 }
 
 type Handler struct {
 	pb.UnimplementedLinkServiceServer
 	linksRepository linksRepository
+	pub             amqpPublisher
 	timeout         time.Duration
 }
 
@@ -78,6 +79,15 @@ func (h Handler) CreateLink(ctx context.Context, request *pb.CreateLinkRequest) 
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
+
+	// Сообщение которое отправляем в очередь
+	type message struct {
+		ID string `json:"id"`
+	}
+
+	// implement me
+	// h.pub.Publish()
+
 	return &pb.Empty{}, nil
 }
 

@@ -13,9 +13,21 @@ type Config struct {
 	ApiGWService ApiGWService `env:",prefix=APIGW_"`
 }
 
+type AMQPConfig struct {
+	User     string `env:"USER,default=guest"`
+	Password string `env:"PASSWORD,default=guest"`
+	Host     string `env:"HOST,default=localhost"`
+	Port     int16  `env:"PORT,default=5672"`
+}
+
+func (a AMQPConfig) String() string {
+	return fmt.Sprintf("amqp://%s:%s@%s:%d/", a.User, a.Password, a.Host, a.Port)
+}
+
 type LinksService struct {
 	Mongo      MongoConfig     `env:",prefix=DB_"`
 	GRPCServer LinksGRPCConfig `env:",prefix=GRPC_"`
+	AMQP       AMQPConfig      `env:",prefix=AMQP_"`
 }
 
 type LinksGRPCConfig struct {

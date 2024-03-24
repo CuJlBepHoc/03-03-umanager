@@ -28,7 +28,7 @@ func runMain(ctx context.Context) error {
 	}
 
 	wg := sync.WaitGroup{}
-	wg.Add(1)
+	wg.Add(2)
 
 	grpcServer := e.LinksGRPCServer
 
@@ -36,6 +36,13 @@ func runMain(ctx context.Context) error {
 		<-ctx.Done()
 		// если посылаем сигнал завершения то завершаем работу нашего сервера
 		grpcServer.Stop()
+	}()
+
+	// Создаем воркер для прослушки очереди и обновления
+	go func() {
+		if err := e.LinkUpdater.Run(ctx); err != nil {
+			slog.Error("link updater Run: %w", err)
+		}
 	}()
 
 	go func() {
