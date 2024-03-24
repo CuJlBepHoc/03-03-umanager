@@ -1,0 +1,46 @@
+syntax = "proto3";
+import "common.proto";
+
+package pb;
+
+option go_package = "gitlab.com/robotomize/gb-golang/homework/03-03-umanager/pkg/pb";
+
+service UserService {
+  rpc CreateUser(CreateUserRequest) returns (Empty) {}
+  rpc GetUser(GetUserRequest) returns (User) {}
+  rpc UpdateUser(UpdateUserRequest) returns (Empty) {}
+  rpc DeleteUser(DeleteUserRequest) returns (Empty) {}
+  rpc ListUsers(Empty) returns (ListUsersResponse) {}
+}
+
+message User {
+  string id = 1;
+  string username = 2;
+  string password = 3; // Предполагается, что пароль может быть пустым
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message CreateUserRequest {
+  string id = 1;
+  string username = 2;
+  string password = 3; // Предполагается, что пароль может быть пустым
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string username = 2;
+  string password = 3; // Предполагается, что пароль может быть пустым
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message ListUsersResponse {
+  repeated User users = 1;
+}

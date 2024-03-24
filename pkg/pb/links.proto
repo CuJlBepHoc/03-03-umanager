@@ -1,0 +1,61 @@
+syntax = "proto3";
+import "common.proto";
+
+
+package pb;
+
+option go_package = "gitlab.com/robotomize/gb-golang/homework/03-03-umanager/pkg/pb";
+
+service LinkService {
+  rpc CreateLink(CreateLinkRequest) returns (Empty) {}
+  rpc GetLink(GetLinkRequest) returns (Link) {}
+  rpc GetLinkByUserID(GetLinksByUserId) returns(ListLinkResponse) {}
+  rpc UpdateLink(UpdateLinkRequest) returns (Empty) {}
+  rpc DeleteLink(DeleteLinkRequest) returns (Empty) {}
+  rpc ListLinks(Empty) returns (ListLinkResponse) {}
+}
+
+message Link {
+  string id = 1;
+  string title = 2;
+  string url = 3;
+  repeated string images = 4;
+  repeated string tags = 5;
+  string user_id = 6;
+  string created_at = 7;
+  string updated_at = 8;
+}
+
+message CreateLinkRequest {
+  string id = 1;
+  string title = 2;
+  string url = 3;
+  repeated string images = 4;
+  repeated string tags = 5;
+  string user_id = 6;
+}
+
+message GetLinkRequest {
+  string id = 1;
+}
+
+message UpdateLinkRequest {
+  string id = 1;
+  string title = 2;
+  string url = 3;
+  repeated string images = 4;
+  repeated string tags = 5;
+  string user_id = 6;
+}
+
+message DeleteLinkRequest {
+  string id = 1;
+}
+
+message ListLinkResponse {
+  repeated Link links = 1;
+}
+
+message GetLinksByUserId {
+  string user_id = 1;
+}

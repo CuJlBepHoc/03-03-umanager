@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+
+package pb;
+
+option go_package = "gitlab.com/robotomize/gb-golang/homework/03-03-umanager/pkg/pb";
+
+message Empty{}
