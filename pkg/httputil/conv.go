@@ -18,6 +18,8 @@ func ConvertHTTPToErrorCode(code int) apiv1.ErrorCode {
 		return apiv1.BadRequest
 	case http.StatusUnsupportedMediaType:
 		return apiv1.BadRequest
+	case http.StatusConflict:
+		return apiv1.Conflict
 	}
 	return apiv1.InternalServerError
 }
@@ -30,7 +32,7 @@ func ConvertGRPCToErrorCode(grpcCode codes.Code) apiv1.ErrorCode {
 		return apiv1.NotFound
 	case codes.InvalidArgument, codes.FailedPrecondition, codes.OutOfRange:
 		return apiv1.BadRequest
-	case codes.Aborted:
+	case codes.Aborted, codes.AlreadyExists:
 		return apiv1.Conflict
 	}
 

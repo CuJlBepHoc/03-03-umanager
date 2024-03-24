@@ -42,6 +42,10 @@ func (h Handler) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (*pb.
 		},
 	)
 	if err != nil {
+		if errors.Is(err, database.ErrConflict) {
+			return nil, status.Error(codes.AlreadyExists, err.Error())
+		}
+
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 

@@ -3,6 +3,7 @@ module gitlab.com/robotomize/gb-golang/homework/03-03-umanager
 go 1.21.0
 
 require (
+	github.com/bxcodec/faker/v4 v4.0.0-beta.3
 	github.com/getkin/kin-openapi v0.123.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-playground/assert/v2 v2.2.0

@@ -20,18 +20,16 @@ type linksHandler struct {
 func (h *linksHandler) GetLinks(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	w.Header().Set("Content-Type", "application/json")
-
 	resp, err := h.client.ListLinks(ctx, nil)
 	if err != nil {
 		handleGRPCError(w, err)
 		return
 	}
 
-	links := make([]*apiv1.Link, len(resp.Links))
+	linkList := make([]apiv1.Link, 0, len(resp.Links))
 	for _, l := range resp.Links {
-		links = append(
-			links, &apiv1.Link{
+		linkList = append(
+			linkList, apiv1.Link{
 				CreatedAt: l.CreatedAt,
 				Id:        l.Id,
 				Images:    l.Images,
@@ -44,12 +42,11 @@ func (h *linksHandler) GetLinks(w http.ResponseWriter, r *http.Request) {
 		)
 	}
 
-	httputil.MarshalResponse(w, http.StatusOK, links)
+	httputil.MarshalResponse(w, http.StatusOK, linkList)
 }
 
 func (h *linksHandler) PostLinks(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	w.Header().Set("Content-Type", "application/json")
 
 	var l apiv1.LinkCreate
 	code, err := httputil.Unmarshal(w, r, &l)
@@ -152,10 +149,10 @@ func (h *linksHandler) GetLinksUserUserID(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	links := make([]*apiv1.Link, len(resp.Links))
+	linkList := make([]apiv1.Link, 0, len(resp.Links))
 	for _, l := range resp.Links {
-		links = append(
-			links, &apiv1.Link{
+		linkList = append(
+			linkList, apiv1.Link{
 				CreatedAt: l.CreatedAt,
 				Id:        l.Id,
 				Images:    l.Images,
@@ -168,5 +165,5 @@ func (h *linksHandler) GetLinksUserUserID(w http.ResponseWriter, r *http.Request
 		)
 	}
 
-	httputil.MarshalResponse(w, http.StatusOK, links)
+	httputil.MarshalResponse(w, http.StatusOK, linkList)
 }

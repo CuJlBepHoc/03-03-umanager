@@ -15,9 +15,17 @@ clean:
 lint:
 	golangci-lint run --timeout 5m -v ./...
 
+.PHONY: drop-links
+drop-links:
+	go run tools/drop-links-db
+
+.PHONY: gen-fake
+gen-fake:
+	go run tools/gen-fakery $(ARGS)
+
 .PHONY: genid
 genid:
-	go run cmd/genid/main.go
+	go run tools/genid/main.go
 
 .PHONY: generate
 generate:
