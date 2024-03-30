@@ -73,7 +73,7 @@ func (r *Repository) Update(ctx context.Context, req database.UpdateLinkReq) (da
 
 	opts := options.Replace().SetUpsert(true)
 
-	if _, err := r.db.Collection(collection).ReplaceOne(ctx, bson.M{"id": req.ID}, l, opts); err != nil {
+	if _, err := r.db.Collection(collection).ReplaceOne(ctx, bson.M{"_id": req.ID}, l, opts); err != nil {
 		return l, fmt.Errorf("mongo ReplaceOne: %w", err)
 	}
 
