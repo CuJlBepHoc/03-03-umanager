@@ -84,7 +84,7 @@ func (r *Repository) Delete(ctx context.Context, id primitive.ObjectID) error {
 	ctx, cancel := context.WithTimeout(ctx, r.timeout)
 	defer cancel()
 
-	if _, err := r.db.Collection(collection).DeleteOne(ctx, bson.M{"id": id}); err != nil {
+	if _, err := r.db.Collection(collection).DeleteOne(ctx, bson.M{"_id": id}); err != nil {
 		return fmt.Errorf("mongo DeletOne: %w", err)
 	}
 
@@ -95,7 +95,7 @@ func (r *Repository) FindByID(ctx context.Context, id primitive.ObjectID) (datab
 	ctx, cancel := context.WithTimeout(ctx, r.timeout)
 	defer cancel()
 	var l database.Link
-	result := r.db.Collection(collection).FindOne(ctx, bson.M{"id": id})
+	result := r.db.Collection(collection).FindOne(ctx, bson.M{"_id": id})
 	if err := result.Err(); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return l, database.ErrNotFound
